@@ -13,6 +13,14 @@ export type Question = {
 export type QuestionAnswers = Question & { answers: string[] }
 
 export type Difficulty = "easy" | "medium" | "hard"
+/* this can also be enum 
+    enum DIFFICULTY { 
+        EASY = "easy"
+        MEDIUM = "medium"
+        HARD = "hard"
+    }
+    it can be accessed like DIFFICULTY.EASY
+*/
 
 export const fetchQuestions = async (amount: number, difficulty: Difficulty) => {
     try {
