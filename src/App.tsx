@@ -4,11 +4,11 @@ import { QuestionCard } from "./components/QuestionCard";
 
 const TOTAL_QUESTIONS = 10;
 
-type Answer = {
+export type Answer = {
   question: string;
   answer: string;
   isCorrect: boolean;
-  correct: string;
+  correctAnswer: string;
 }
 
 export const App = () => {
@@ -18,6 +18,8 @@ export const App = () => {
   const [userAnswers, setUserAnswers] = useState<Answer[]>([]);
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(true);
+  const displayNextQuestionBtn = userAnswers.length === number + 1 && number !== TOTAL_QUESTIONS;
+  const isLastQuestionAnswered = userAnswers.length === TOTAL_QUESTIONS;
 
   const startTrivia = async () => {
     setLoading(true);
@@ -35,9 +37,30 @@ export const App = () => {
     }
   }
 
-  const nextQuestion = () => { }
+  const nextQuestion = () => {
+    const nextQuestion = number + 1;
+    if (nextQuestion === TOTAL_QUESTIONS) {
+      setGameOver(true);
+    } else {
+      setNumber(nextQuestion);
+    }
+  }
 
-  const checkAnswer = (e: React.MouseEvent<HTMLButtonElement>) => { }
+  const checkAnswer = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const answer = e.currentTarget.value;
+    const isCorrect = questions[number].correct_answer === answer;
+
+    if (isCorrect) {
+      setScore(prev => prev + 1);
+    }
+    const answerObject = {
+      question: questions[number].question,
+      answer,
+      isCorrect,
+      correctAnswer: questions[number].correct_answer
+    }
+    setUserAnswers(prev => [...prev, answerObject])
+  }
 
   return (
     <div className="App">
@@ -45,10 +68,12 @@ export const App = () => {
       {loading ?
         <p>Loading Questions...</p> :
         <>
-          {gameOver ?
-            <button className="start" onClick={startTrivia}>Start</button> :
+          {(gameOver || isLastQuestionAnswered) &&
+            <button className="start" onClick={startTrivia}>Start</button>
+          }
+          {!gameOver &&
             <>
-              <p className="score">Score: </p>
+              <p className="score">Score: {score}</p>
               <QuestionCard
                 questionNr={number + 1}
                 totalQuestions={TOTAL_QUESTIONS}
@@ -57,9 +82,11 @@ export const App = () => {
                 userAnswer={userAnswers ? userAnswers[number] : undefined}
                 callback={checkAnswer}
               />
+              {displayNextQuestionBtn &&
+                <button className="next" onClick={nextQuestion}>Next Question</button>
+              }
             </>
           }
-          <button className="next" onClick={nextQuestion}>Next Question</button>
         </>
       }
     </div>
